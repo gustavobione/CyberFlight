@@ -1,0 +1,13 @@
+# Pastas do VSCode e SO
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Arquivos de compilação e temporários do Java/Processing
+out/
+build/
+*.class
+*.jar
+java_pid*.crash
+
+.autosave
