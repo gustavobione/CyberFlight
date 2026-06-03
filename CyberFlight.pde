@@ -23,7 +23,8 @@ final int ESTADO_ANIMACAO_VITORIA = 5;
 final int ESTADO_VITORIA = 6;
 final int ESTADO_GAMEOVER = 7;
 final int ESTADO_PAUSE = 8; 
-final int ESTADO_CREDITOS = 9; // NOVO: ESTADO DE CRÉDITOS
+final int ESTADO_CREDITOS = 9; 
+final int ESTADO_INSTRUCOES = 10; // NOVO: ESTADO DE INSTRUÇÕES (TUTORIAL)
 int estadoJogo = ESTADO_LOGIN;
 int estadoAnterior = ESTADO_JOGANDO; 
 PImage telaPausada; 
@@ -129,7 +130,7 @@ void aplicarShake() {
 }
 
 void draw() {
-  if (estadoJogo == ESTADO_LOGIN || estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS) {
+  if (estadoJogo == ESTADO_LOGIN || estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS || estadoJogo == ESTADO_INSTRUCOES) {
     if (imgMenuBG != null) image(imgMenuBG, 0, 0); else { fill(10, 15, 30); rect(0, 0, width, height); }
   } else if (estadoJogo != ESTADO_PAUSE) { 
     float velocidadeFundo = (estadoJogo == ESTADO_ANIMACAO_VITORIA) ? 6 : 2 * (dificuldade * 0.8);
@@ -141,8 +142,9 @@ void draw() {
 
   switch (estadoJogo) {
     case ESTADO_LOGIN: exibirTelaLogin(); break;
+    case ESTADO_INSTRUCOES: exibirTelaInstrucoes(); break; // NOVO: CHAMA A TELA DE TUTORIAL
     case ESTADO_LEADERBOARD: exibirTelaLeaderboard(); break;
-    case ESTADO_CREDITOS: exibirTelaCreditos(); break; // CHAMA TELA DE CRÉDITOS
+    case ESTADO_CREDITOS: exibirTelaCreditos(); break; 
     case ESTADO_CONTAGEM: executarContagem(); break;
     case ESTADO_JOGANDO: executarLoopJogo(); break;
     case ESTADO_BOSS: executarBatalhaBoss(); break;
@@ -153,7 +155,60 @@ void draw() {
   }
 }
 
-// ===== NOVO FLUXO: PAUSE =====
+// ===== NOVO FLUXO: INSTRUÇÕES (TUTORIAL) =====
+void exibirTelaInstrucoes() {
+  fill(0, 180); rect(0, 0, width, height); // Escurece o fundo
+  
+  // Título
+  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); 
+  text("MANUAL DO DATA RUNNER", width/2, 100);
+  
+  // Divisão da tela em Controles (Esquerda) e Elementos (Direita)
+  float centroEsq = width * 0.35;
+  float centroDir = width * 0.65;
+  
+  // --- CONTROLES ---
+  fill(255); textSize(35); text("CONTROLES", centroEsq, 220);
+  
+  textSize(25); textAlign(LEFT, CENTER); fill(200);
+  text("W / A / S / D  ou  SETAS - Movimentar Nave", centroEsq - 250, 300);
+  text("X - Disparar Laser Primário", centroEsq - 250, 370);
+  text("ESPAÇO ou C - Ativar Pulso EMP (Consome carga)", centroEsq - 250, 440);
+  text("P ou ESC - Pausar o Sistema", centroEsq - 250, 510);
+  
+  // --- ELEMENTOS E ITENS ---
+  textAlign(CENTER, CENTER); fill(255); textSize(35); text("ELEMENTOS", centroDir, 220);
+  
+  textAlign(LEFT, CENTER); textSize(24); fill(200);
+  
+  // Exibindo Ícones para explicar o jogo
+  float imgX = centroDir - 200;
+  float textoX = centroDir - 130;
+  
+  image(imgPlayer, imgX, 280, 50, 50);
+  text("Você. Sobreviva e faça Upload dos Dados.", textoX, 305);
+  
+  image(imgBarricada, imgX, 360, 50, 50); // Usando barricada como exemplo de obstáculo
+  text("Desvie ou Destrua Inimigos e Obstáculos.", textoX, 385);
+  
+  // Caixa de PowerUps
+  fill(0, 100, 100, 150); stroke(0, 255, 255); strokeWeight(2);
+  rect(imgX - 20, 450, 450, 160, 10);
+  fill(0, 255, 255); textSize(20); text("COLETE DROPS (POWER-UPS)", imgX, 475);
+  
+  image(imgPowerUpVida, imgX, 500, 40, 40);
+  fill(200); textSize(20); text("Restaura 1 Vida", textoX, 520);
+  
+  image(imgPowerUpEspecial, imgX, 550, 40, 40);
+  text("Recarrega 1 Pulso EMP", textoX, 570);
+  
+  image(imgPowerUpTiro, imgX + 220, 500, 40, 40);
+  text("Laser Duplo", imgX + 270, 520);
+  
+  // Botão Iniciar (Embaixo no centro)
+  desenharBotaoMenu("INICIAR HACKING", width/2, height - 120);
+}
+
 void exibirTelaPause() {
   if (telaPausada != null) image(telaPausada, 0, 0); 
   fill(0, 180); rect(0, 0, width, height); 
@@ -167,7 +222,6 @@ void exibirTelaLogin() {
   fill(0, 180); rect(0, 0, width, height);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(90); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 180);
   
-  // Botões do menu reposicionados
   desenharBotaoMenu("JOGAR", width/2, height/2 - 30);
   desenharBotaoMenu("LEADERBOARD", width/2, height/2 + 60);
   desenharBotaoMenu("CRÉDITOS", width/2, height/2 + 150);
@@ -204,11 +258,13 @@ void desenharBotaoMenu(String texto, float bX, float bY) {
 
 void mousePressed() {
   if (estadoJogo == ESTADO_LOGIN) {
-    if (checarCliqueBotao(width/2, height/2 - 30)) { estadoJogo = ESTADO_CONTAGEM; framesContagem = 0; }
+    if (checarCliqueBotao(width/2, height/2 - 30)) { estadoJogo = ESTADO_INSTRUCOES; } // AGORA VAI PARA INSTRUÇÕES
     if (checarCliqueBotao(width/2, height/2 + 60)) { estadoJogo = ESTADO_LEADERBOARD; }
-    if (checarCliqueBotao(width/2, height/2 + 150)) { estadoJogo = ESTADO_CREDITOS; } // NOVO: Botão Créditos
+    if (checarCliqueBotao(width/2, height/2 + 150)) { estadoJogo = ESTADO_CREDITOS; } 
     if (checarCliqueBotao(width/2, height/2 + 240)) { exit(); }
-  } else if (estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS) { // NOVO: Lógica Voltar Créditos
+  } else if (estadoJogo == ESTADO_INSTRUCOES) { // NOVO: BOTÃO DA TELA DE INSTRUÇÕES
+    if (checarCliqueBotao(width/2, height - 120)) { estadoJogo = ESTADO_CONTAGEM; framesContagem = 0; }
+  } else if (estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS) { 
     float voltarY = (estadoJogo == ESTADO_CREDITOS) ? height/2 + 200 : height/2 + 150;
     if (checarCliqueBotao(width/2, voltarY)) { estadoJogo = ESTADO_LOGIN; }
   } else if (estadoJogo == ESTADO_PAUSE) { 
@@ -242,7 +298,7 @@ void executarLoopJogo() {
 
   gerenciarMovimentoJogador(); gerenciarTirosJogador(); gerenciarSpawn();
   
-  pushMatrix(); // O SHAKE SÓ AFETA OS OBJETOS DO JOGO, NÃO A HUD
+  pushMatrix(); 
   aplicarShake();
   atualizarObjetos();
   desenharParticulas(); 
@@ -511,15 +567,14 @@ boolean colisaoOndaEMP(float ondaX, float ondaY, float ondaR, float objX, float 
 void keyPressed() {
   if (key == ENTER) { if (estadoJogo == ESTADO_VITORIA) { estadoJogo = ESTADO_LOGIN; pontuacao = 0; dificuldade = 1.0; vidas = 5; cargasEMP = 1; timerPowerUpTiro = 0; bossHP = bossHPMax; reiniciarObjetos(); } }
   
-  // SISTEMA DE PAUSE (P ou ESC)
   if (key == 'p' || key == 'P' || key == ESC) {
-    if (key == ESC) key = 0; // Impede que o ESC feche o jogo nativamente
+    if (key == ESC) key = 0; 
     if (estadoJogo == ESTADO_JOGANDO || estadoJogo == ESTADO_BOSS) {
-      estadoAnterior = estadoJogo; // Salva se estava no jogo normal ou boss
-      telaPausada = get(); // Tira print exato da tela pra usar de fundo do pause!
+      estadoAnterior = estadoJogo; 
+      telaPausada = get(); 
       estadoJogo = ESTADO_PAUSE;
     } else if (estadoJogo == ESTADO_PAUSE) {
-      estadoJogo = estadoAnterior; // Retoma o jogo
+      estadoJogo = estadoAnterior; 
     }
   }
 
@@ -528,7 +583,7 @@ void keyPressed() {
   if (key == 'x' || key == 'X') atirando = true;
   
   if ((key == ' ' || key == 'c' || key == 'C') && cargasEMP > 0 && (estadoJogo == ESTADO_JOGANDO || estadoJogo == ESTADO_BOSS) && especialOnda == null) { 
-    especialOnda = new OndaEMP(x + larguraNave/2, y + alturaNave/2); cargasEMP--; shakeTimer = 20; // SCREEN SHAKE DO EMP
+    especialOnda = new OndaEMP(x + larguraNave/2, y + alturaNave/2); cargasEMP--; shakeTimer = 20; 
     if (somEMP != null) somEMP.play(); 
   }
   if ((key == 'r' || key == 'R') && estadoJogo == ESTADO_GAMEOVER) {
