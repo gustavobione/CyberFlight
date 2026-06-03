@@ -1,4 +1,10 @@
 import processing.sound.*; 
+import ch.bildspur.postfx.builder.*;
+import ch.bildspur.postfx.pass.*;
+import ch.bildspur.postfx.*;
+
+// ===== MOTOR DE EFEITOS VISUAIS (VFX) =====
+PostFX fx;
 
 // ===== IMAGENS GLOBAIS =====
 PImage imgPlayer, imgPlayerUp, imgDown, imgRight, imgLeft, imgPlayerBroken, spriteAtual;
@@ -59,12 +65,15 @@ void setup() {
   limiteEsq = width * 0.22; limiteDir = width * 0.78;
   carregarHighscore(); 
   
-  // CARREGAMENTO DE FONTES (Lendo da pasta data/Font)
-  fonteNormal = createFont("Font/Orbitron-Regular.ttf", 32);
-  fonteTitulo = createFont("Font/Orbitron-ExtraBold.ttf", 80);
-  textFont(fonteNormal); // Define a fonte padrão do jogo
+  // INICIALIZA O POSTFX
+  fx = new PostFX(this);
   
-  // CARREGAMENTO DE IMAGENS COM AS NOVAS ROTAS
+  // CARREGAMENTO DE FONTES 
+  try { fonteNormal = createFont("Font/Orbitron-Regular.ttf", 32); } catch(Exception e) { fonteNormal = createFont("Arial", 32); }
+  try { fonteTitulo = createFont("Font/Orbitron-ExtraBold.ttf", 80); } catch(Exception e) { fonteTitulo = createFont("Arial", 80); }
+  textFont(fonteNormal); 
+  
+  // CARREGAMENTO DE IMAGENS
   imgPlayer = loadImage("Sprites/Player/nave.png"); 
   imgPlayerUp = loadImage("Sprites/Player/naveUp.png");
   imgDown = loadImage("Sprites/Player/naveDown.png"); 
@@ -104,8 +113,8 @@ void setup() {
   
   resetPosicaoNave();
   
-  // CARREGAMENTO DE ÁUDIOS COM AS NOVAS ROTAS
-  try { somMusicaFundo = new SoundFile(this, "Sound/Musica/MusicaFundo.wav"); somMusicaFundo.amp(0.6); somMusicaFundo.loop(); } catch(Exception e) {}
+  // CARREGAMENTO DE ÁUDIOS 
+  try { somMusicaFundo = new SoundFile(this, "Sound/SFX/MusicaFundo.wav"); somMusicaFundo.amp(0.6); somMusicaFundo.loop(); } catch(Exception e) {}
   try { somLaserPlayer = new SoundFile(this, "Sound/SFX/LaserPlayer.wav"); somLaserPlayer.amp(0.1); } catch(Exception e) {}
   try { somDanoNave = new SoundFile(this, "Sound/SFX/DanoNave.wav"); } catch(Exception e) {}
   try { somLaserInimigo = new SoundFile(this, "Sound/SFX/LaserInimigo.wav"); somLaserInimigo.amp(0.1); } catch(Exception e) {}
@@ -139,6 +148,24 @@ void draw() {
     case ESTADO_VITORIA: exibirTelaVitoria(); break;
     case ESTADO_GAMEOVER: exibirTelaGameOver(); break;
     case ESTADO_PAUSE: exibirTelaPause(); break;
+  }
+  
+  // ============================================
+  // APLICAÇÃO DOS EFEITOS ESPECIAIS (VFX - NEON E GLITCH)
+  // ============================================
+  if (estadoJogo == ESTADO_JOGANDO || estadoJogo == ESTADO_BOSS || estadoJogo == ESTADO_ANIMACAO_VITORIA) {
+    PostFXBuilder pass = fx.render();
+    
+    // 1. Efeito Bloom (Faz os Lasers, Partículas e PowerUps brilharem como Neon real)
+    pass.bloom(0.4, 20, 30); // Limite de brilho, Tamanho do Blur, Intensidade
+    
+    // 2. Efeito Chromatic Aberration / Glitch (Só ativa quando toma dano ou solta bomba)
+    if (shakeTimer > 0) {
+      float distorcao = map(shakeTimer, 0, 40, 0, 100);
+      pass.rgbSplit(distorcao); 
+    }
+    
+    pass.compose(); // Finaliza e desenha na tela
   }
 }
 

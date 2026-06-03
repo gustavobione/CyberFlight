@@ -143,9 +143,24 @@ class InimigoLaserContinuo {
 }
 void checarColisaoLaserContinuo(InimigoLaserContinuo nl) { if (nl.estado == 1 && invencivelFrames == 0) { float hitX = (nl.lado == 0) ? nl.x + nl.tamanho : limiteEsq; float hitW = (nl.lado == 0) ? limiteDir - (nl.x + nl.tamanho) : nl.x - limiteEsq; float hitY = nl.y + nl.tamanho/2 - 15; float hitH = 30; if (colisaoNave(x, y, larguraNave, alturaNave, hitX, hitY, hitW, hitH)) { receberDano(); } } }
 
-// ===== PROJÉTEIS INIMIGOS =====
+// ===== PROJÉTEIS INIMIGOS COM VFX DE LUZ =====
 class LaserInimigo {
-  float x, y, velocidade = 7; LaserInimigo(float startX, float startY) { x = startX; y = startY; } void atualizar() { y += velocidade * dificuldade; }
-  void desenhar() { if(imgLaserInimigo != null) image(imgLaserInimigo, x-10, y-10, 20, 45); else { fill(255, 50, 50); noStroke(); rect(x, y, 8, 25); } }
+  float x, y; float velocidade = 7; 
+  LaserInimigo(float startX, float startY) { x = startX; y = startY; } void atualizar() { y += velocidade * dificuldade; }
+  void desenhar() { 
+    blendMode(ADD); // Efeito visual
+    if(imgLaserInimigo != null) image(imgLaserInimigo, x-10, y-10, 20, 45); 
+    else { fill(255, 50, 50); noStroke(); rect(x, y, 8, 25); } 
+    blendMode(BLEND);
+  }
 }
-class LaserInimigoSimples extends LaserInimigo { float vx, vy; LaserInimigoSimples(float x, float y, float vx, float vy) { super(x, y); this.vx = vx; this.vy = vy; } void atualizar() { x += vx; y += vy; } void desenhar() { fill(255, 100, 100); noStroke(); ellipse(x, y, 15, 15); } }
+
+class LaserInimigoSimples extends LaserInimigo {
+  float vx, vy; LaserInimigoSimples(float x, float y, float vx, float vy) { super(x, y); this.vx = vx; this.vy = vy; }
+  void atualizar() { x += vx; y += vy; } 
+  void desenhar() { 
+    blendMode(ADD); // Efeito Visual 
+    fill(255, 100, 100); noStroke(); ellipse(x, y, 15, 15); 
+    blendMode(BLEND);
+  } 
+}

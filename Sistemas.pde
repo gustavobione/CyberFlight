@@ -9,16 +9,16 @@ void desenharBotaoMenu(String texto, float bX, float bY) {
   if (hover) { fill(0, 255, 255, 100); stroke(255); } else { fill(0, 100, 100, 150); stroke(0, 255, 255); }
   strokeWeight(3); rect(bX - bW/2, bY - bH/2, bW, bH, 10);
   
-  textFont(fonteNormal); // Fonte padrão para o botão
+  if(fonteNormal != null) textFont(fonteNormal); 
   fill(255); textSize(30); textAlign(CENTER, CENTER); text(texto, bX, bY - 5);
 }
 
 boolean checarCliqueBotao(float bX, float bY) { return mouseX > bX - 175 && mouseX < bX + 175 && mouseY > bY - 35 && mouseY < bY + 35; }
 
-// ===== MENU INICIAL =====
+// ===== TELAS DE MENU =====
 void exibirTelaLogin() {
   fill(0, 180); rect(0, 0, width, height);
-  textFont(fonteTitulo); // FONTE EXTRA BOLD PARA O TÍTULO
+  if(fonteTitulo != null) textFont(fonteTitulo); 
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 180);
   
   desenharBotaoMenu("JOGAR", width/2, height/2 - 30);
@@ -27,14 +27,12 @@ void exibirTelaLogin() {
   desenharBotaoMenu("SAIR", width/2, height/2 + 240);
 }
 
-// ===== INSTRUÇÕES =====
 void exibirTelaInstrucoes() {
   fill(0, 180); rect(0, 0, width, height); 
-  
-  textFont(fonteTitulo);
+  if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(50); text("MANUAL DO DATA RUNNER", width/2, 100);
   
-  textFont(fonteNormal); // Volta para a fonte normal
+  if(fonteNormal != null) textFont(fonteNormal); 
   float centroEsq = width * 0.35, centroDir = width * 0.65;
   
   fill(255); textSize(30); text("CONTROLES", centroEsq, 220);
@@ -60,24 +58,20 @@ void exibirTelaInstrucoes() {
   desenharBotaoMenu("INICIAR HACKING", width/2, height - 120);
 }
 
-// ===== LEADERBOARD =====
 void exibirTelaLeaderboard() {
   fill(0, 180); rect(0, 0, width, height);
-  textFont(fonteTitulo);
+  if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); text("HALL OF FAME", width/2, height/2 - 150);
-  
-  textFont(fonteNormal);
+  if(fonteNormal != null) textFont(fonteNormal);
   fill(255, 255, 0); textSize(50); text("MAIOR PONTUAÇÃO: " + nf(highscore, 7), width/2, height/2);
   desenharBotaoMenu("VOLTAR", width/2, height/2 + 150);
 }
 
-// ===== CRÉDITOS =====
 void exibirTelaCreditos() {
   fill(0, 180); rect(0, 0, width, height);
-  textFont(fonteTitulo);
+  if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); text("DESENVOLVEDORES", width/2, height/2 - 200);
-  
-  textFont(fonteNormal);
+  if(fonteNormal != null) textFont(fonteNormal);
   fill(255); textSize(35);
   text("Gustavo Teixeira Bione", width/2, height/2 - 60);
   text("Thiago Lima Freire", width/2, height/2);
@@ -85,18 +79,16 @@ void exibirTelaCreditos() {
   desenharBotaoMenu("VOLTAR", width/2, height/2 + 200);
 }
 
-// ===== PAUSE =====
 void exibirTelaPause() {
   if (telaPausada != null) image(telaPausada, 0, 0); 
   fill(0, 180); rect(0, 0, width, height); 
-  textFont(fonteTitulo);
+  if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(80); text("PAUSADO", width/2, height/2 - 150);
   desenharBotaoMenu("RETOMAR", width/2, height/2); desenharBotaoMenu("DESISTIR", width/2, height/2 + 100);
 }
 
-// ===== HUD E EFEITOS =====
 void desenharHUD() {
-  textFont(fonteNormal);
+  if(fonteNormal != null) textFont(fonteNormal);
   strokeWeight(2); stroke(0, 255, 255, 150); fill(0, 100); rect(20, 20, 320, 130, 8);
   fill(0, 255, 255); textSize(16); textAlign(LEFT, TOP); text("SYSTEM STATUS", 30, 25);
   for (int i = 0; i < 5; i++) { if (i < vidas) { tint(255); } else { tint(50, 150); } image(imgVidaNormal, 30 + (i * 50), 50); noTint(); }
@@ -114,11 +106,16 @@ void desenharHUD() {
 
 void aplicarShake() { if (shakeTimer > 0) { translate(random(-10, 10), random(-10, 10)); shakeTimer--; } }
 
+// ===== SISTEMA DE PARTICULAS (COM LUZ NEON VFX) =====
 class Particula {
   float x, y, vx, vy, tamanho; int vida, vidaMax; color cor;
   Particula(float startX, float startY, color c) { x = startX; y = startY; cor = c; vx = random(-6, 6); vy = random(-6, 6); tamanho = random(4, 12); vidaMax = (int)random(15, 30); vida = vidaMax; }
   void atualizar() { x += vx; y += vy; vida--; tamanho *= 0.95; }
-  void desenhar() { noStroke(); fill(cor, map(vida, 0, vidaMax, 0, 255)); rect(x, y, tamanho, tamanho); }
+  void desenhar() { 
+    blendMode(ADD); // VFX: Soma a cor da partícula com o fundo criando luz
+    noStroke(); fill(cor, map(vida, 0, vidaMax, 0, 255)); rect(x, y, tamanho, tamanho); 
+    blendMode(BLEND); // Volta ao normal
+  }
 }
 void criarParticulas(float x, float y, int qtd, color cor) { for (int i = 0; i < qtd; i++) particulas.add(new Particula(x, y, cor)); }
 void desenharParticulas() { for (int i = particulas.size() - 1; i >= 0; i--) { Particula p = particulas.get(i); p.atualizar(); p.desenhar(); if (p.vida <= 0) particulas.remove(i); } }
@@ -126,7 +123,7 @@ void desenharParticulas() { for (int i = particulas.size() - 1; i >= 0; i--) { P
 // ===== LOOPS GERAIS DO JOGO E TELAS FINAIS =====
 void executarContagem() {
   framesContagem++; int segundosRestantes = 3 - (framesContagem / 60);
-  textFont(fonteTitulo);
+  if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255, 150); textAlign(CENTER, CENTER); textSize(120);
   if (segundosRestantes > 0) { text(segundosRestantes, width/2, height/2); } 
   else { text("HACKING START!", width/2, height/2); if (framesContagem > 240) { estadoJogo = ESTADO_JOGANDO; proximoSpawnFrame = frameCount + 60; } }
@@ -150,15 +147,15 @@ void executarLoopJogo() {
 
 void exibirTelaGameOver() { 
   fill(0, 15); rect(0, 0, width, height); 
-  textFont(fonteTitulo); fill(255, 50, 50); textAlign(CENTER, CENTER); textSize(80); text("SYSTEM FAILURE", width/2, height/2 - 50); 
-  textFont(fonteNormal); fill(255); textSize(35); text("SCORE FINAL: " + nf(pontuacao, 7), width/2, height/2 + 20); 
+  if(fonteTitulo != null) textFont(fonteTitulo); fill(255, 50, 50); textAlign(CENTER, CENTER); textSize(80); text("SYSTEM FAILURE", width/2, height/2 - 50); 
+  if(fonteNormal != null) textFont(fonteNormal); fill(255); textSize(35); text("SCORE FINAL: " + nf(pontuacao, 7), width/2, height/2 + 20); 
   fill(200); textSize(20); text("Pressione 'R' para reiniciar ou 'M' para Menu", width/2, height/2 + 80); 
 }
 
 void exibirTelaVitoria() { 
   fill(0, 150); rect(0, 0, width, height); 
-  textFont(fonteTitulo); fill(0, 255, 0); textAlign(CENTER, CENTER); textSize(80); text("HACKING CONCLUÍDO", width/2, height/2 - 50); 
-  textFont(fonteNormal); fill(255); textSize(35); text("DADOS TRANSMITIDOS COM SUCESSO!", width/2, height/2 + 20); 
+  if(fonteTitulo != null) textFont(fonteTitulo); fill(0, 255, 0); textAlign(CENTER, CENTER); textSize(80); text("HACKING CONCLUÍDO", width/2, height/2 - 50); 
+  if(fonteNormal != null) textFont(fonteNormal); fill(255); textSize(35); text("DADOS TRANSMITIDOS COM SUCESSO!", width/2, height/2 + 20); 
   fill(0, 255, 255); textSize(20); text("Pressione ENTER para voltar ao Menu", width/2, height/2 + 80); 
 }
 
@@ -169,22 +166,32 @@ void executarAnimacaoVitoria() {
   if (y < -150) { salvarHighscore(); estadoJogo = ESTADO_VITORIA; }
 }
 
-// ===== POWER-UPS E EMP =====
+// ===== POWER-UPS (COM VFX BLEND) =====
 class PowerUp {
   float x, y, velocidade = 3.0, tamanho = 50; int tipo; 
   PowerUp(float startX, float startY) { this.x = constrain(startX, limiteEsq + 50, limiteDir - 100); this.y = startY; float sorteio = random(100); if (sorteio < 40) tipo = 0; else if (sorteio < 70) tipo = 1; else tipo = 2; }
   void atualizar() { y += velocidade; x += sin(frameCount * 0.1) * 0.5; }
-  void desenhar() { noStroke(); if (tipo == 0) fill(50, 255, 100, 50); else if (tipo == 1) fill(255, 255, 0, 50); else if (tipo == 2) fill(50, 100, 255, 50); ellipse(x + tamanho/2, y + tamanho/2, tamanho*1.5, tamanho*1.5); switch (tipo) { case 0: image(imgPowerUpVida, x, y, tamanho, tamanho); break; case 1: image(imgPowerUpEspecial, x, y, tamanho, tamanho); break; case 2: image(imgPowerUpTiro, x, y, tamanho, tamanho); break; } }
+  void desenhar() { 
+    blendMode(ADD); // VFX
+    noStroke(); if (tipo == 0) fill(50, 255, 100, 100); else if (tipo == 1) fill(255, 255, 0, 100); else if (tipo == 2) fill(50, 100, 255, 100); ellipse(x + tamanho/2, y + tamanho/2, tamanho*1.5, tamanho*1.5); 
+    blendMode(BLEND);
+    switch (tipo) { case 0: image(imgPowerUpVida, x, y, tamanho, tamanho); break; case 1: image(imgPowerUpEspecial, x, y, tamanho, tamanho); break; case 2: image(imgPowerUpTiro, x, y, tamanho, tamanho); break; } 
+  }
 }
 
 void aplicarPowerUp(PowerUp p) { if (somPowerUp != null) somPowerUp.play(); switch (p.tipo) { case 0: if (vidas < 5) vidas++; break; case 1: if (cargasEMP < maxCargasEMP) cargasEMP++; break; case 2: timerPowerUpTiro = 900; break; } }
 void spawnPowerUpChance(float px, float py) { if (random(100) < 15) { powerups.add(new PowerUp(px, py)); } }
 
+// ===== ONDA EMP (VFX LUZ PURA) =====
 class OndaEMP {
   float x, y, raio = 0, raioMax = 500, velocidadeExpansao = 15; boolean finalizada = false;
   OndaEMP(float startX, float startY) { this.x = startX; this.y = startY; }
   void atualizar() { if (raio < raioMax) { raio += velocidadeExpansao; } else { finalizada = true; } }
-  void desenhar() { noFill(); stroke(255, 255, 0, map(raio, 0, raioMax, 255, 0)); strokeWeight(15); ellipse(x, y, raio * 2, raio * 2); }
+  void desenhar() { 
+    blendMode(ADD); // VFX
+    noFill(); stroke(255, 255, 0, map(raio, 0, raioMax, 255, 0)); strokeWeight(15); ellipse(x, y, raio * 2, raio * 2); 
+    blendMode(BLEND);
+  }
 }
 
 void destruirOndaEMP(ArrayList lista) {

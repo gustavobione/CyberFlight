@@ -10,11 +10,16 @@ void gerenciarMovimentoJogador() {
   image(spriteAtual, x, y);
 }
 
-// ===== TIRO E ARMAS =====
+// ===== TIRO E ARMAS COM VFX =====
 class Laser {
   float x, y; float velocidade = 20; 
   Laser(float startX, float startY) { x = startX; y = startY; } void atualizar() { y -= velocidade; }
-  void desenhar() { if(imgLaserPlayer != null) image(imgLaserPlayer, x-10, y-10, 20, 45); else { fill(0, 255, 255); noStroke(); rect(x, y, 6, 25); } }
+  void desenhar() { 
+    blendMode(ADD); // VFX Luz Neon
+    if(imgLaserPlayer != null) image(imgLaserPlayer, x-10, y-10, 20, 45); 
+    else { fill(0, 255, 255); noStroke(); rect(x, y, 6, 25); } 
+    blendMode(BLEND);
+  }
 }
 
 void gerenciarTirosJogador() {
