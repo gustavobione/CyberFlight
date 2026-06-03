@@ -9,7 +9,7 @@ void desenharBotaoMenu(String texto, float bX, float bY) {
   if (hover) { fill(0, 255, 255, 100); stroke(255); } else { fill(0, 100, 100, 150); stroke(0, 255, 255); }
   strokeWeight(3); rect(bX - bW/2, bY - bH/2, bW, bH, 10);
   
-  if(fonteNormal != null) textFont(fonteNormal); 
+  if(fonteNormal != null) textFont(fonteNormal);  
   fill(255); textSize(30); textAlign(CENTER, CENTER); text(texto, bX, bY - 5);
 }
 
@@ -18,13 +18,14 @@ boolean checarCliqueBotao(float bX, float bY) { return mouseX > bX - 175 && mous
 // ===== TELAS DE MENU =====
 void exibirTelaLogin() {
   fill(0, 180); rect(0, 0, width, height);
-  if(fonteTitulo != null) textFont(fonteTitulo); 
-  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 180);
+  if(fonteTitulo != null) textFont(fonteTitulo);  
+  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(70); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 220);
   
   desenharBotaoMenu("JOGAR", width/2, height/2 - 30);
-  desenharBotaoMenu("LEADERBOARD", width/2, height/2 + 60);
-  desenharBotaoMenu("CRÉDITOS", width/2, height/2 + 150);
-  desenharBotaoMenu("SAIR", width/2, height/2 + 240);
+  desenharBotaoMenu("CONFIGURAÇÕES", width/2, height/2 + 60);
+  desenharBotaoMenu("LEADERBOARD", width/2, height/2 + 150);
+  desenharBotaoMenu("CRÉDITOS", width/2, height/2 + 240);
+  desenharBotaoMenu("SAIR", width/2, height/2 + 330);
 }
 
 void exibirTelaInstrucoes() {
@@ -32,14 +33,14 @@ void exibirTelaInstrucoes() {
   if(fonteTitulo != null) textFont(fonteTitulo);
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(50); text("MANUAL DO DATA RUNNER", width/2, 100);
   
-  if(fonteNormal != null) textFont(fonteNormal); 
+  if(fonteNormal != null) textFont(fonteNormal);  
   float centroEsq = width * 0.35, centroDir = width * 0.65;
   
   fill(255); textSize(30); text("CONTROLES", centroEsq, 220);
   textSize(20); textAlign(LEFT, CENTER); fill(200);
-  text("W / A / S / D  ou  SETAS - Movimentar Nave", centroEsq - 250, 300);
-  text("X - Disparar Laser Primário", centroEsq - 250, 370);
-  text("ESPAÇO ou C - Ativar Pulso EMP", centroEsq - 250, 440);
+  text(obterNomeTecla(teclaUp) + " / " + obterNomeTecla(teclaLeft) + " / " + obterNomeTecla(teclaDown) + " / " + obterNomeTecla(teclaRight) + " - Mover", centroEsq - 250, 300);
+  text(obterNomeTecla(teclaAtirar) + " - Disparar Laser Primário", centroEsq - 250, 370);
+  text(obterNomeTecla(teclaEMP) + " - Ativar Pulso EMP", centroEsq - 250, 440);
   text("P ou ESC - Pausar o Sistema", centroEsq - 250, 510);
   
   textAlign(CENTER, CENTER); fill(255); textSize(30); text("ELEMENTOS", centroDir, 220);
