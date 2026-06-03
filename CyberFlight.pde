@@ -22,10 +22,11 @@ final int ESTADO_BOSS = 4;
 final int ESTADO_ANIMACAO_VITORIA = 5;
 final int ESTADO_VITORIA = 6;
 final int ESTADO_GAMEOVER = 7;
-final int ESTADO_PAUSE = 8; // NOVO ESTADO DE PAUSE
+final int ESTADO_PAUSE = 8; 
+final int ESTADO_CREDITOS = 9; // NOVO: ESTADO DE CRÉDITOS
 int estadoJogo = ESTADO_LOGIN;
-int estadoAnterior = ESTADO_JOGANDO; // Guarda de onde o pause veio
-PImage telaPausada; // Guarda o print da tela para o menu de pause
+int estadoAnterior = ESTADO_JOGANDO; 
+PImage telaPausada; 
 
 // ===== SISTEMA DE JUICE (EFEITOS VISUAIS) =====
 int shakeTimer = 0;
@@ -88,8 +89,10 @@ void setup() {
   imgMinaMagnetica = loadImage("Bomb.png"); imgPowerUpEspecial = loadImage("Special.png");
   imgPowerUpVida = loadImage("Vida.png"); imgPowerUpTiro = loadImage("Upgrade.png");
   imgMothershipBoss = loadImage("Boss.png"); imgKamikaze = loadImage("Kamikaze.png");
-  imgLaserPlayer = loadImage("LaserPlayer.png"); imgLaserInimigo = loadImage("LaserInimigo.png");
-  imgMenuBG = loadImage("MenuBG.png"); imgBossDefeated = loadImage("BossDefeated.png");
+  try { imgLaserPlayer = loadImage("LaserPlayer.png"); } catch(Exception e) {}
+  try { imgLaserInimigo = loadImage("LaserInimigo.png"); } catch(Exception e) {}
+  try { imgMenuBG = loadImage("MenuBG.png"); } catch(Exception e) {}
+  try { imgBossDefeated = loadImage("BossDefeated.png"); } catch(Exception e) {}
   
   imgPlayer.resize(larguraNave, alturaNave); imgPlayerUp.resize(larguraNave, alturaNave);
   imgDown.resize(larguraNave, alturaNave); imgRight.resize(larguraNave, alturaNave);
@@ -126,9 +129,9 @@ void aplicarShake() {
 }
 
 void draw() {
-  if (estadoJogo == ESTADO_LOGIN || estadoJogo == ESTADO_LEADERBOARD) {
+  if (estadoJogo == ESTADO_LOGIN || estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS) {
     if (imgMenuBG != null) image(imgMenuBG, 0, 0); else { fill(10, 15, 30); rect(0, 0, width, height); }
-  } else if (estadoJogo != ESTADO_PAUSE) { // Fundo congela no pause
+  } else if (estadoJogo != ESTADO_PAUSE) { 
     float velocidadeFundo = (estadoJogo == ESTADO_ANIMACAO_VITORIA) ? 6 : 2 * (dificuldade * 0.8);
     bgY1 += velocidadeFundo; bgY2 += velocidadeFundo;
     if (bgY1 >= height) bgY1 = bgY2 - imgBackground.height;
@@ -139,6 +142,7 @@ void draw() {
   switch (estadoJogo) {
     case ESTADO_LOGIN: exibirTelaLogin(); break;
     case ESTADO_LEADERBOARD: exibirTelaLeaderboard(); break;
+    case ESTADO_CREDITOS: exibirTelaCreditos(); break; // CHAMA TELA DE CRÉDITOS
     case ESTADO_CONTAGEM: executarContagem(); break;
     case ESTADO_JOGANDO: executarLoopJogo(); break;
     case ESTADO_BOSS: executarBatalhaBoss(); break;
@@ -151,8 +155,8 @@ void draw() {
 
 // ===== NOVO FLUXO: PAUSE =====
 void exibirTelaPause() {
-  if (telaPausada != null) image(telaPausada, 0, 0); // Desenha a screenshot do jogo
-  fill(0, 180); rect(0, 0, width, height); // Escurece a tela
+  if (telaPausada != null) image(telaPausada, 0, 0); 
+  fill(0, 180); rect(0, 0, width, height); 
   fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(90); 
   text("PAUSADO", width/2, height/2 - 150);
   desenharBotaoMenu("RETOMAR", width/2, height/2);
@@ -161,10 +165,13 @@ void exibirTelaPause() {
 
 void exibirTelaLogin() {
   fill(0, 180); rect(0, 0, width, height);
-  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(90); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 150);
-  desenharBotaoMenu("JOGAR", width/2, height/2);
-  desenharBotaoMenu("LEADERBOARD", width/2, height/2 + 100);
-  desenharBotaoMenu("SAIR", width/2, height/2 + 200);
+  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(90); text("CYBERFLIGHT: DATA RUNNER", width/2, height/2 - 180);
+  
+  // Botões do menu reposicionados
+  desenharBotaoMenu("JOGAR", width/2, height/2 - 30);
+  desenharBotaoMenu("LEADERBOARD", width/2, height/2 + 60);
+  desenharBotaoMenu("CRÉDITOS", width/2, height/2 + 150);
+  desenharBotaoMenu("SAIR", width/2, height/2 + 240);
 }
 
 void exibirTelaLeaderboard() {
@@ -173,6 +180,19 @@ void exibirTelaLeaderboard() {
   fill(255, 255, 0); textSize(60); text("MAIOR PONTUAÇÃO: " + nf(highscore, 7), width/2, height/2);
   desenharBotaoMenu("VOLTAR", width/2, height/2 + 150);
 }
+
+void exibirTelaCreditos() {
+  fill(0, 180); rect(0, 0, width, height);
+  fill(0, 255, 255); textAlign(CENTER, CENTER); textSize(80); text("DESENVOLVEDORES", width/2, height/2 - 200);
+  
+  fill(255); textSize(45);
+  text("Gustavo Teixeira Bione", width/2, height/2 - 60);
+  text("Thiago Lima Freire", width/2, height/2);
+  text("Lucas Ferraz Valença Parente", width/2, height/2 + 60);
+  
+  desenharBotaoMenu("VOLTAR", width/2, height/2 + 200);
+}
+
 
 void desenharBotaoMenu(String texto, float bX, float bY) {
   float bW = 350; float bH = 70;
@@ -184,12 +204,14 @@ void desenharBotaoMenu(String texto, float bX, float bY) {
 
 void mousePressed() {
   if (estadoJogo == ESTADO_LOGIN) {
-    if (checarCliqueBotao(width/2, height/2)) { estadoJogo = ESTADO_CONTAGEM; framesContagem = 0; }
-    if (checarCliqueBotao(width/2, height/2 + 100)) { estadoJogo = ESTADO_LEADERBOARD; }
-    if (checarCliqueBotao(width/2, height/2 + 200)) { exit(); }
-  } else if (estadoJogo == ESTADO_LEADERBOARD) {
-    if (checarCliqueBotao(width/2, height/2 + 150)) { estadoJogo = ESTADO_LOGIN; }
-  } else if (estadoJogo == ESTADO_PAUSE) { // BOTÕES DO PAUSE
+    if (checarCliqueBotao(width/2, height/2 - 30)) { estadoJogo = ESTADO_CONTAGEM; framesContagem = 0; }
+    if (checarCliqueBotao(width/2, height/2 + 60)) { estadoJogo = ESTADO_LEADERBOARD; }
+    if (checarCliqueBotao(width/2, height/2 + 150)) { estadoJogo = ESTADO_CREDITOS; } // NOVO: Botão Créditos
+    if (checarCliqueBotao(width/2, height/2 + 240)) { exit(); }
+  } else if (estadoJogo == ESTADO_LEADERBOARD || estadoJogo == ESTADO_CREDITOS) { // NOVO: Lógica Voltar Créditos
+    float voltarY = (estadoJogo == ESTADO_CREDITOS) ? height/2 + 200 : height/2 + 150;
+    if (checarCliqueBotao(width/2, voltarY)) { estadoJogo = ESTADO_LOGIN; }
+  } else if (estadoJogo == ESTADO_PAUSE) { 
     if (checarCliqueBotao(width/2, height/2)) { estadoJogo = estadoAnterior; }
     if (checarCliqueBotao(width/2, height/2 + 100)) { estadoJogo = ESTADO_LOGIN; reiniciarObjetos(); }
   }
@@ -247,7 +269,6 @@ void executarBatalhaBoss() {
   }
 }
 
-// ... [MANTER executarAnimacaoVitoria, desenharHUD, exibirTelaGameOver, exibirTelaVitoria] ...
 void executarAnimacaoVitoria() {
   oBoss.y += 4; 
   pushMatrix(); translate(oBoss.x + oBoss.largura/2, oBoss.y + oBoss.altura/2);
@@ -347,7 +368,7 @@ void atualizarObjetos() {
         lasers.remove(i); laserRemovido = true; pontuacao += 150; 
         if (somExplosao != null) somExplosao.play(); 
         m.dispararEstrela(); 
-        minas.remove(j); // AQUI: Remove a mina fisicamente da lista para não virar parede!
+        minas.remove(j); 
         break; 
       }
     } if (laserRemovido) continue;
@@ -424,7 +445,6 @@ void atualizarInimigoGenerico(ArrayList lista, boolean hpNaveTomaDano) {
       if (hpNaveTomaDano) { 
         lista.remove(i); 
       } else if (obj instanceof MinaMagnetica) {
-        // Se a nave bater na mina, a mina explode e some para não bloquear!
         MinaMagnetica m = (MinaMagnetica)obj;
         m.dispararEstrela();
         lista.remove(i); 
@@ -443,7 +463,7 @@ void checarColisaoLaserContinuo(InimigoLaserContinuo nl) {
 }
 
 void receberDano() { 
-  vidas--; invencivelFrames = 60; shakeTimer = 15; // SCREEN SHAKE NO DANO
+  vidas--; invencivelFrames = 60; shakeTimer = 15; 
   if (somDanoNave != null) somDanoNave.play(); 
   if (vidas <= 0) { estadoJogo = ESTADO_GAMEOVER; }
 }
