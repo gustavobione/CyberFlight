@@ -12,7 +12,17 @@ void gerenciarSpawn() {
       else if (navesDesbloqueadas) { if (sorteio < 40) spawnBarricada(); else if (sorteio < 70) spawnMina(); else spawnNaveAtiradora(); }
       else if (minasDesbloqueadas) { if (sorteio < 60) spawnBarricada(); else spawnMina(); } else { spawnBarricada(); }
     }
-    proximoSpawnFrame = frameCount + (int)(random(60, 180) / dificuldade);
+    
+    // RITMO DE DIFICULDADE (Pacing) - Dá um respiro se a tela estiver cheia
+    int inimigosNaTela = inimigos.size() + kamikazes.size() + navesLaser.size() + serpentes.size();
+    int delayBase = (int)(random(60, 180) / dificuldade);
+    
+    // Se tiver 5 ou mais inimigos ativos, adia o próximo spawn para evitar frustração
+    if (inimigosNaTela >= 5) {
+        delayBase += 80; 
+    }
+    
+    proximoSpawnFrame = frameCount + delayBase;
   }
 }
 
@@ -115,12 +125,25 @@ class InimigoAtirador {
   void atirar() { int intTiro = max(50, (int)(120 / dificuldade)); if (frameCount - frameUltimoTiro >= intTiro) { lasersInimigos.add(new LaserInimigo(x + tamanho/2 - 4, y + tamanho)); if(somLaserInimigo != null) somLaserInimigo.play(); frameUltimoTiro = frameCount; } }
 }
 
-// ===== KAMIKAZE =====
+// ===== KAMIKAZE (COM TELEGRAFIA) =====
 class InimigoKamikaze {
   float x, y, velocidade = 5.0, tamanho_local_w = 50, tamanho_local_h = 120, tamanho_world_w, tamanho_world_h;
   InimigoKamikaze(float startX, float startY) { this.x = startX; this.y = startY; this.tamanho_world_w = tamanho_local_w; this.tamanho_world_h = tamanho_local_h; }
   void atualizar() { y += velocidade * dificuldade; }
-  void desenhar() { pushMatrix(); translate(x + tamanho_world_w/2, y + tamanho_world_h/2); rotate(HALF_PI); image(imgKamikaze, -tamanho_local_h/2, -tamanho_local_w/2, tamanho_local_h, tamanho_local_w); popMatrix(); }
+  
+  void desenhar() { 
+    // TELEGRAFIA DO KAMIKAZE (Laser vermelho preditivo)
+    if (y < height * 0.4) {
+      blendMode(ADD);
+      stroke(255, 0, 0, map(y, -100, height * 0.4, 255, 0)); // Some suavemente ao descer
+      strokeWeight(2);
+      line(x + tamanho_world_w/2, y + tamanho_world_h, x + tamanho_world_w/2, height);
+      noStroke();
+      blendMode(BLEND);
+    }
+    
+    pushMatrix(); translate(x + tamanho_world_w/2, y + tamanho_world_h/2); rotate(HALF_PI); image(imgKamikaze, -tamanho_local_h/2, -tamanho_local_w/2, tamanho_local_h, tamanho_local_w); popMatrix(); 
+  }
 }
 
 // ===== SERPENTE =====
